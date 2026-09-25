@@ -255,7 +255,7 @@ final class HttpAgentTests: XCTestCase {
         let weatherTool = Tool(
             name: "get_weather",
             description: "Get weather for a location",
-            parameters: Data("{}".utf8)
+            parameters: [:]
         )
 
         // Execute with messages and tools

@@ -56,8 +56,8 @@ struct ActivitySnapshotEventDTO {
             // Content was double-encoded as a JSON string — unwrap it.
             contentData = stringData
         } else {
-            let encoder = JSONEncoder()
-            contentData = try encoder.encode(JSONPrimitiveWrapper(value: contentValue))
+            // Primitives: `.fragmentsAllowed` keeps NSNumber booleans and numbers distinct
+            contentData = try JSONSerialization.data(withJSONObject: contentValue, options: .fragmentsAllowed)
         }
 
         return ActivitySnapshotEventDTO(

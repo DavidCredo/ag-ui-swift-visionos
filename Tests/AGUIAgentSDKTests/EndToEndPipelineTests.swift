@@ -293,7 +293,7 @@ private final class SimpleMockExecutor: ToolExecutor, Sendable {
         self.tool = Tool(
             name: toolName,
             description: description,
-            parameters: Data("{}".utf8)
+            parameters: [:]
         )
     }
 

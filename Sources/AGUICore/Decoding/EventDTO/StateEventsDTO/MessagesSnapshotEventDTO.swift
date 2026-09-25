@@ -34,9 +34,8 @@ struct MessagesSnapshotEventDTO {
             // Collections can use JSONSerialization
             messagesData = try JSONSerialization.data(withJSONObject: messagesValue, options: [])
         } else {
-            // Primitives need JSONEncoder
-            let encoder = JSONEncoder()
-            messagesData = try encoder.encode(JSONPrimitiveWrapper(value: messagesValue))
+            // Primitives: `.fragmentsAllowed` keeps NSNumber booleans and numbers distinct
+            messagesData = try JSONSerialization.data(withJSONObject: messagesValue, options: .fragmentsAllowed)
         }
 
         return MessagesSnapshotEventDTO(messages: messagesData, timestamp: timestamp)

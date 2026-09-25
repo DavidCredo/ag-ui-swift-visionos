@@ -160,33 +160,28 @@ public struct RunAgentInput: Sendable, Codable, Hashable {
         // An empty {} object causes some adapters (e.g. claude-agent-sdk) to
         // spin up unnecessary state-management infrastructure. null is the
         // correct sentinel for "caller has no state to manage."
-        let stateObject = try JSONSerialization.jsonObject(with: state)
-        if let stateDict = stateObject as? [String: Any], stateDict.isEmpty {
+        // Values are re-encoded via `JSONValue` so booleans and numbers stay distinct.
+        let jsonDecoder = JSONDecoder()
+        let stateValue = try jsonDecoder.decode(JSONValue.self, from: state)
+        if stateValue == .object([:]) {
             try container.encodeNil(forKey: .state)
         } else {
-            var stateContainer = container.nestedContainer(keyedBy: JSONCodingKeys.self, forKey: .state)
-            try stateContainer.encodeJSONObject(stateObject)
+            try container.encode(stateValue, forKey: .state)
         }
 
         // Encode messages as polymorphic array using MessageEncoder
         let messageEncoder = MessageEncoder()
-        var messagesArray: [Any] = []
-        for message in messages {
-            let messageData = try messageEncoder.encode(message)
-            let messageDict = try JSONSerialization.jsonObject(with: messageData)
-            messagesArray.append(messageDict)
+        let messagesArray = try messages.map { message in
+            try jsonDecoder.decode(JSONValue.self, from: messageEncoder.encode(message))
         }
-        var messagesContainer = container.nestedUnkeyedContainer(forKey: .messages)
-        try messagesContainer.encodeJSONArray(messagesArray)
+        try container.encode(messagesArray, forKey: .messages)
 
         // Encode tools and context arrays (these already conform to Codable)
         try container.encode(tools, forKey: .tools)
         try container.encode(context, forKey: .context)
 
         // Encode forwardedProps as arbitrary JSON object
-        let propsObject = try JSONSerialization.jsonObject(with: forwardedProps)
-        var propsContainer = container.nestedContainer(keyedBy: JSONCodingKeys.self, forKey: .forwardedProps)
-        try propsContainer.encodeJSONObject(propsObject)
+        try container.encode(try jsonDecoder.decode(JSONValue.self, from: forwardedProps), forKey: .forwardedProps)
     }
 
     // MARK: - Hashable

@@ -51,7 +51,7 @@ final class RunAgentInputTests: XCTestCase {
             Tool(
                 name: "get_weather",
                 description: "Get weather data",
-                parameters: Data("{\"type\": \"object\"}".utf8)
+                parameters: ["type": "object"]
             )
         ]
 
@@ -114,7 +114,7 @@ final class RunAgentInputTests: XCTestCase {
             UserMessage(id: "msg-1", content: "Test")
         ]
         let tools = [
-            Tool(name: "tool1", description: "Test tool", parameters: Data("{}".utf8))
+            Tool(name: "tool1", description: "Test tool", parameters: [:])
         ]
         let contexts = [
             Context(description: "ctx1", value: "val1")
@@ -383,7 +383,7 @@ final class RunAgentInputTests: XCTestCase {
             UserMessage(id: "msg-1", content: "Test")
         ]
         let tools = [
-            Tool(name: "tool1", description: "Test", parameters: Data("{}".utf8))
+            Tool(name: "tool1", description: "Test", parameters: [:])
         ]
         let contexts = [
             Context(description: "key", value: "val")
@@ -571,14 +571,12 @@ final class RunAgentInputTests: XCTestCase {
             Tool(
                 name: "get_weather",
                 description: "Get current weather",
-                parameters: Data("""
-                {
+                parameters: [
                     "type": "object",
-                    "properties": {
-                        "location": {"type": "string"}
-                    }
-                }
-                """.utf8)
+                    "properties": [
+                        "location": ["type": "string"]
+                    ]
+                ]
             )
         ]
 

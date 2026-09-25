@@ -136,8 +136,8 @@ final class AgUiAgentTests: XCTestCase {
     // MARK: - Tool registry integration
 
     func testSendMessageIncludesToolsFromRegistry() async throws {
-        let tool1 = Tool(name: "get_weather", description: "Get weather", parameters: Data("{}".utf8))
-        let tool2 = Tool(name: "search_web", description: "Search the web", parameters: Data("{}".utf8))
+        let tool1 = Tool(name: "get_weather", description: "Get weather", parameters: [:])
+        let tool2 = Tool(name: "search_web", description: "Search the web", parameters: [:])
         let registry = MockToolRegistry(tools: [tool1, tool2])
 
         let (agent, transport) = makeCapturingAgent { config in

@@ -14,7 +14,7 @@ final class CircuitBreakerIntegrationTests: XCTestCase {
     private struct NetworkError: Error {}
 
     private func makeTool(name: String? = nil) -> Tool {
-        Tool(name: name ?? toolName, description: "Gets weather", parameters: Data("{}".utf8))
+        Tool(name: name ?? toolName, description: "Gets weather", parameters: [:])
     }
 
     private func makeContext(name: String? = nil) -> ToolExecutionContext {

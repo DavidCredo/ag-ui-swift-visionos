@@ -27,7 +27,7 @@ final class RunAgentInputBuilderTests: XCTestCase {
             UserMessage(id: "msg-1", content: "Hello")
         ]
         let tools = [
-            Tool(name: "tool1", description: "Test tool", parameters: Data("{}".utf8))
+            Tool(name: "tool1", description: "Test tool", parameters: [:])
         ]
         let contexts = [
             Context(description: "key", value: "val")
@@ -145,7 +145,7 @@ final class RunAgentInputBuilderTests: XCTestCase {
     // MARK: - Tool Building Tests
 
     func testBuilderWithSingleTool() throws {
-        let tool = Tool(name: "get_weather", description: "Get weather", parameters: Data("{}".utf8))
+        let tool = Tool(name: "get_weather", description: "Get weather", parameters: [:])
 
         let input = try RunAgentInput.builder()
             .threadId("t1")
@@ -161,8 +161,8 @@ final class RunAgentInputBuilderTests: XCTestCase {
         let input = try RunAgentInput.builder()
             .threadId("t1")
             .runId("r1")
-            .tool(Tool(name: "tool1", description: "Tool 1", parameters: Data("{}".utf8)))
-            .tool(Tool(name: "tool2", description: "Tool 2", parameters: Data("{}".utf8)))
+            .tool(Tool(name: "tool1", description: "Tool 1", parameters: [:]))
+            .tool(Tool(name: "tool2", description: "Tool 2", parameters: [:]))
             .build()
 
         XCTAssertEqual(input.tools.count, 2)
@@ -262,7 +262,7 @@ final class RunAgentInputBuilderTests: XCTestCase {
         let weatherTool = Tool(
             name: "get_weather",
             description: "Get current weather",
-            parameters: Data("{\"type\": \"object\"}".utf8)
+            parameters: ["type": "object"]
         )
 
         let input = try RunAgentInput.builder()

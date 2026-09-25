@@ -44,8 +44,8 @@ struct CustomEventDTO {
             } else if dataValue is [Any] || dataValue is [String: Any] {
                 eventData = try JSONSerialization.data(withJSONObject: dataValue, options: [])
             } else {
-                let encoder = JSONEncoder()
-                eventData = try encoder.encode(JSONPrimitiveWrapper(value: dataValue))
+                // Primitives: `.fragmentsAllowed` keeps NSNumber booleans and numbers distinct
+                eventData = try JSONSerialization.data(withJSONObject: dataValue, options: .fragmentsAllowed)
             }
         } else {
             eventData = Data("{}".utf8)

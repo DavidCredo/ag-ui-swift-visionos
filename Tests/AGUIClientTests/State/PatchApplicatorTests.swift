@@ -1,6 +1,7 @@
 // Copyright (c) 2025 Perfect Aduh. MIT License. See LICENSE for details.
 
 import XCTest
+import AGUICore
 @testable import AGUIClient
 
 /// Comprehensive tests for RFC 6902 JSON Patch implementation.
@@ -504,5 +505,31 @@ final class PatchApplicatorTests: XCTestCase {
 
         // ~0 should be unescaped to ~
         XCTAssertEqual(json["a~b"] as? Int, 1)
+    }
+
+    // MARK: - Boolean / Number Fidelity
+
+    func testAddPreservesBooleansAndZeroOne() throws {
+        let state = Data(#"{"count":1,"off":false}"#.utf8)
+        let patch = Data(#"[{"op":"add","path":"/on","value":true},{"op":"add","path":"/zero","value":0},{"op":"add","path":"/list","value":[1,false]}]"#.utf8)
+
+        let result = try applicator.apply(patch: patch, to: state)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        let reencoded = try encoder.encode(JSONDecoder().decode(JSONValue.self, from: result))
+
+        XCTAssertEqual(
+            String(decoding: reencoded, as: UTF8.self),
+            #"{"count":1,"list":[1,false],"off":false,"on":true,"zero":0}"#
+        )
+    }
+
+    func testTestOperationDoesNotTreatOneAsTrue() {
+        let state = Data(#"{"flag":1}"#.utf8)
+        let patch = Data(#"[{"op":"test","path":"/flag","value":true}]"#.utf8)
+
+        // Known bug: `valuesEqual` compares via `NSObject ==`, and NSNumber(1) == NSNumber(true).
+        XCTExpectFailure("PatchApplicator `test` op treats 1 and true as equal")
+        XCTAssertThrowsError(try applicator.apply(patch: patch, to: state))
     }
 }

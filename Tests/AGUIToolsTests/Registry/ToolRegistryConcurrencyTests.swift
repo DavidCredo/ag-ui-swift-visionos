@@ -20,7 +20,7 @@ final class ToolRegistryConcurrencyTests: XCTestCase {
                     let tool = Tool(
                         name: "concurrent_tool_\(i)",
                         description: "Tool \(i)",
-                        parameters: Data("{}".utf8)
+                        parameters: [:]
                     )
                     let executor = TestToolExecutor(tool: tool)
                     try await registry.register(executor: executor)
@@ -43,7 +43,7 @@ final class ToolRegistryConcurrencyTests: XCTestCase {
             let tool = Tool(
                 name: "unregister_tool_\(i)",
                 description: "Tool \(i)",
-                parameters: Data("{}".utf8)
+                parameters: [:]
             )
             try await registry.register(executor: TestToolExecutor(tool: tool))
         }
@@ -70,7 +70,7 @@ final class ToolRegistryConcurrencyTests: XCTestCase {
         let tool = Tool(
             name: "concurrent_exec",
             description: "Concurrent execution test",
-            parameters: Data("{}".utf8)
+            parameters: [:]
         )
         let executor = TestToolExecutor(tool: tool)
         try await registry.register(executor: executor)
@@ -114,7 +114,7 @@ final class ToolRegistryConcurrencyTests: XCTestCase {
             let tool = Tool(
                 name: "multi_tool_\(i)",
                 description: "Tool \(i)",
-                parameters: Data("{}".utf8)
+                parameters: [:]
             )
             try await registry.register(executor: TestToolExecutor(tool: tool))
         }
@@ -157,7 +157,7 @@ final class ToolRegistryConcurrencyTests: XCTestCase {
                     let tool = Tool(
                         name: "mixed_tool_\(i)",
                         description: "Tool \(i)",
-                        parameters: Data("{}".utf8)
+                        parameters: [:]
                     )
                     try await registry.register(executor: TestToolExecutor(tool: tool))
                 }
@@ -209,7 +209,7 @@ final class ToolRegistryConcurrencyTests: XCTestCase {
         let tool = Tool(
             name: "race_test",
             description: "Race condition test",
-            parameters: Data("{}".utf8)
+            parameters: [:]
         )
         try await registry.register(executor: TestToolExecutor(tool: tool))
 
@@ -243,7 +243,7 @@ final class ToolRegistryConcurrencyTests: XCTestCase {
         let tool = Tool(
             name: "stats_query_test",
             description: "Test",
-            parameters: Data("{}".utf8)
+            parameters: [:]
         )
         try await registry.register(executor: TestToolExecutor(tool: tool))
 
@@ -286,7 +286,7 @@ final class ToolRegistryConcurrencyTests: XCTestCase {
             let tool = Tool(
                 name: "stress_tool_\(i)",
                 description: "Tool \(i)",
-                parameters: Data("{}".utf8)
+                parameters: [:]
             )
             try await registry.register(executor: TestToolExecutor(tool: tool))
         }
@@ -331,7 +331,7 @@ final class ToolRegistryConcurrencyTests: XCTestCase {
         let tool = Tool(
             name: "actor_test",
             description: "Actor isolation test",
-            parameters: Data("{}".utf8)
+            parameters: [:]
         )
         try await registry.register(executor: TestToolExecutor(tool: tool))
 

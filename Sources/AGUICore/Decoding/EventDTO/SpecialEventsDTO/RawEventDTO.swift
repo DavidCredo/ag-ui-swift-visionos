@@ -39,9 +39,8 @@ struct RawEventDTO {
             // Collections can use JSONSerialization
             eventData = try JSONSerialization.data(withJSONObject: eventValue, options: [])
         } else {
-            // Primitives need JSONEncoder
-            let encoder = JSONEncoder()
-            eventData = try encoder.encode(JSONPrimitiveWrapper(value: eventValue))
+            // Primitives: `.fragmentsAllowed` keeps NSNumber booleans and numbers distinct
+            eventData = try JSONSerialization.data(withJSONObject: eventValue, options: .fragmentsAllowed)
         }
 
         return RawEventDTO(data: eventData, source: source, timestamp: timestamp)

@@ -90,7 +90,7 @@ final class ToolExecutorTests: XCTestCase {
         let tool = Tool(
             name: "test_tool",
             description: "A test tool",
-            parameters: Data("{}".utf8)
+            parameters: [:]
         )
 
         // When: Creating an executor
@@ -106,7 +106,7 @@ final class ToolExecutorTests: XCTestCase {
         let tool = Tool(
             name: "weather_tool",
             description: "Get weather",
-            parameters: Data("{}".utf8)
+            parameters: [:]
         )
         let executor = MockToolExecutor(tool: tool)
         let successResult = ToolExecutionResult.success(message: "Success")
@@ -132,7 +132,7 @@ final class ToolExecutorTests: XCTestCase {
         let tool = Tool(
             name: "failing_tool",
             description: "A tool that fails",
-            parameters: Data("{}".utf8)
+            parameters: [:]
         )
         let executor = MockToolExecutor(tool: tool)
         let testError = ToolExecutionError.validationFailed(message: "Invalid input")
@@ -163,7 +163,7 @@ final class ToolExecutorTests: XCTestCase {
         let tool = Tool(
             name: "default_validation_tool",
             description: "Tool with default validation",
-            parameters: Data("{}".utf8)
+            parameters: [:]
         )
         let executor = MockToolExecutor(tool: tool)
 
@@ -183,7 +183,7 @@ final class ToolExecutorTests: XCTestCase {
         let tool = Tool(
             name: "no_timeout_tool",
             description: "Tool without timeout",
-            parameters: Data("{}".utf8)
+            parameters: [:]
         )
         let executor = MockToolExecutor(tool: tool)
 
@@ -265,7 +265,7 @@ final class ToolExecutorTests: XCTestCase {
         let tool = Tool(
             name: "sendable_test",
             description: "Test sendable",
-            parameters: Data("{}".utf8)
+            parameters: [:]
         )
         let executor = MockToolExecutor(tool: tool)
 
@@ -292,7 +292,7 @@ final class ToolExecutorTests: XCTestCase {
         let tool = Tool(
             name: "complete_tool",
             description: "Complete tool for integration test",
-            parameters: Data(#"{"type": "object", "properties": {"value": {"type": "number"}}}"#.utf8)
+            parameters: ["type": "object", "properties": ["value": ["type": "number"]]]
         )
         let executor = MockToolExecutor(tool: tool)
         let resultData = Data(#"{"result": 42}"#.utf8)

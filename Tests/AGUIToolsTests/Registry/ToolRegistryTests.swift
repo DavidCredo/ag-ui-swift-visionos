@@ -72,7 +72,7 @@ final class ToolRegistryTests: XCTestCase {
     func testRegisterTool() async throws {
         // Given: A registry and a tool executor
         let registry = DefaultToolRegistry()
-        let tool = Tool(name: "test_tool", description: "Test", parameters: Data("{}".utf8))
+        let tool = Tool(name: "test_tool", description: "Test", parameters: [:])
         let executor = TestToolExecutor(tool: tool)
 
         // When: Registering the tool
@@ -88,8 +88,8 @@ final class ToolRegistryTests: XCTestCase {
     func testRegisterMultipleTools() async throws {
         // Given: A registry and multiple tool executors
         let registry = DefaultToolRegistry()
-        let tool1 = Tool(name: "tool_1", description: "Tool 1", parameters: Data("{}".utf8))
-        let tool2 = Tool(name: "tool_2", description: "Tool 2", parameters: Data("{}".utf8))
+        let tool1 = Tool(name: "tool_1", description: "Tool 1", parameters: [:])
+        let tool2 = Tool(name: "tool_2", description: "Tool 2", parameters: [:])
         let executor1 = TestToolExecutor(tool: tool1)
         let executor2 = TestToolExecutor(tool: tool2)
 
@@ -107,7 +107,7 @@ final class ToolRegistryTests: XCTestCase {
     func testRegisterDuplicateToolThrowsError() async throws {
         // Given: A registry with a registered tool
         let registry = DefaultToolRegistry()
-        let tool = Tool(name: "duplicate", description: "Test", parameters: Data("{}".utf8))
+        let tool = Tool(name: "duplicate", description: "Test", parameters: [:])
         let executor1 = TestToolExecutor(tool: tool)
         let executor2 = TestToolExecutor(tool: tool)
         try await registry.register(executor: executor1)
@@ -129,7 +129,7 @@ final class ToolRegistryTests: XCTestCase {
     func testRegisterToolWithEmptyNameThrowsError() async throws {
         // Given: A tool with empty name
         let registry = DefaultToolRegistry()
-        let tool = Tool(name: "", description: "Test", parameters: Data("{}".utf8))
+        let tool = Tool(name: "", description: "Test", parameters: [:])
         let executor = TestToolExecutor(tool: tool)
 
         // When/Then: Registering should throw
@@ -151,7 +151,7 @@ final class ToolRegistryTests: XCTestCase {
     func testUnregisterTool() async throws {
         // Given: A registry with a registered tool
         let registry = DefaultToolRegistry()
-        let tool = Tool(name: "removable", description: "Test", parameters: Data("{}".utf8))
+        let tool = Tool(name: "removable", description: "Test", parameters: [:])
         let executor = TestToolExecutor(tool: tool)
         try await registry.register(executor: executor)
 
@@ -180,7 +180,7 @@ final class ToolRegistryTests: XCTestCase {
     func testGetExecutorForRegisteredTool() async throws {
         // Given: A registry with a registered tool
         let registry = DefaultToolRegistry()
-        let tool = Tool(name: "lookup_test", description: "Test", parameters: Data("{}".utf8))
+        let tool = Tool(name: "lookup_test", description: "Test", parameters: [:])
         let executor = TestToolExecutor(tool: tool)
         try await registry.register(executor: executor)
 
@@ -205,7 +205,7 @@ final class ToolRegistryTests: XCTestCase {
     func testIsToolRegistered() async throws {
         // Given: A registry with a registered tool
         let registry = DefaultToolRegistry()
-        let tool = Tool(name: "check_tool", description: "Test", parameters: Data("{}".utf8))
+        let tool = Tool(name: "check_tool", description: "Test", parameters: [:])
         let executor = TestToolExecutor(tool: tool)
         try await registry.register(executor: executor)
 
@@ -220,9 +220,9 @@ final class ToolRegistryTests: XCTestCase {
         // Given: A registry with multiple tools
         let registry = DefaultToolRegistry()
         let tools = [
-            Tool(name: "tool_a", description: "A", parameters: Data("{}".utf8)),
-            Tool(name: "tool_b", description: "B", parameters: Data("{}".utf8)),
-            Tool(name: "tool_c", description: "C", parameters: Data("{}".utf8))
+            Tool(name: "tool_a", description: "A", parameters: [:]),
+            Tool(name: "tool_b", description: "B", parameters: [:]),
+            Tool(name: "tool_c", description: "C", parameters: [:])
         ]
 
         for tool in tools {
@@ -243,7 +243,7 @@ final class ToolRegistryTests: XCTestCase {
     func testExecuteToolSuccessfully() async throws {
         // Given: A registry with a registered tool
         let registry = DefaultToolRegistry()
-        let tool = Tool(name: "exec_tool", description: "Test", parameters: Data("{}".utf8))
+        let tool = Tool(name: "exec_tool", description: "Test", parameters: [:])
         let executor = TestToolExecutor(tool: tool)
         let expectedResult = ToolExecutionResult.success(message: "Success!")
         await executor.setResult(expectedResult)
@@ -289,7 +289,7 @@ final class ToolRegistryTests: XCTestCase {
     func testExecuteToolWithError() async throws {
         // Given: A registry with a tool that throws an error
         let registry = DefaultToolRegistry()
-        let tool = Tool(name: "failing_tool", description: "Test", parameters: Data("{}".utf8))
+        let tool = Tool(name: "failing_tool", description: "Test", parameters: [:])
         let executor = TestToolExecutor(tool: tool)
         let expectedError = ToolExecutionError.validationFailed(message: "Invalid input")
         await executor.setError(expectedError)
@@ -320,7 +320,7 @@ final class ToolRegistryTests: XCTestCase {
     func testStatsInitiallyEmpty() async throws {
         // Given: A registry with a newly registered tool
         let registry = DefaultToolRegistry()
-        let tool = Tool(name: "stats_tool", description: "Test", parameters: Data("{}".utf8))
+        let tool = Tool(name: "stats_tool", description: "Test", parameters: [:])
         let executor = TestToolExecutor(tool: tool)
         try await registry.register(executor: executor)
 
@@ -337,7 +337,7 @@ final class ToolRegistryTests: XCTestCase {
     func testStatsAfterSuccessfulExecution() async throws {
         // Given: A registry with a tool
         let registry = DefaultToolRegistry()
-        let tool = Tool(name: "success_stats", description: "Test", parameters: Data("{}".utf8))
+        let tool = Tool(name: "success_stats", description: "Test", parameters: [:])
         let executor = TestToolExecutor(tool: tool)
         try await registry.register(executor: executor)
 
@@ -360,7 +360,7 @@ final class ToolRegistryTests: XCTestCase {
     func testStatsAfterFailedExecution() async throws {
         // Given: A registry with a tool that fails
         let registry = DefaultToolRegistry()
-        let tool = Tool(name: "fail_stats", description: "Test", parameters: Data("{}".utf8))
+        let tool = Tool(name: "fail_stats", description: "Test", parameters: [:])
         let executor = TestToolExecutor(tool: tool)
         await executor.setError(ToolExecutionError.validationFailed(message: "Fail"))
         try await registry.register(executor: executor)
@@ -384,7 +384,7 @@ final class ToolRegistryTests: XCTestCase {
     func testStatsAverageExecutionTime() async throws {
         // Given: A registry with a tool
         let registry = DefaultToolRegistry()
-        let tool = Tool(name: "timing_tool", description: "Test", parameters: Data("{}".utf8))
+        let tool = Tool(name: "timing_tool", description: "Test", parameters: [:])
         let executor = TestToolExecutor(tool: tool)
         await executor.setDelay(.milliseconds(10))
         try await registry.register(executor: executor)
@@ -408,7 +408,7 @@ final class ToolRegistryTests: XCTestCase {
     func testClearStats() async throws {
         // Given: A registry with execution history
         let registry = DefaultToolRegistry()
-        let tool = Tool(name: "clear_stats", description: "Test", parameters: Data("{}".utf8))
+        let tool = Tool(name: "clear_stats", description: "Test", parameters: [:])
         let executor = TestToolExecutor(tool: tool)
         try await registry.register(executor: executor)
 
@@ -443,8 +443,8 @@ final class ToolRegistryTests: XCTestCase {
         // Given: A registry with multiple tools
         let registry = DefaultToolRegistry()
         let tools = [
-            Tool(name: "tool_stats_1", description: "1", parameters: Data("{}".utf8)),
-            Tool(name: "tool_stats_2", description: "2", parameters: Data("{}".utf8))
+            Tool(name: "tool_stats_1", description: "1", parameters: [:]),
+            Tool(name: "tool_stats_2", description: "2", parameters: [:])
         ]
 
         for tool in tools {

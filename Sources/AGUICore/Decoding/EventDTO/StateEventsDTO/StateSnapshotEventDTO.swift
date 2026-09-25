@@ -34,9 +34,8 @@ struct StateSnapshotEventDTO {
             // Collections can use JSONSerialization
             snapshotData = try JSONSerialization.data(withJSONObject: snapshotValue, options: [])
         } else {
-            // Primitives need JSONEncoder
-            let encoder = JSONEncoder()
-            snapshotData = try encoder.encode(JSONPrimitiveWrapper(value: snapshotValue))
+            // Primitives: `.fragmentsAllowed` keeps NSNumber booleans and numbers distinct
+            snapshotData = try JSONSerialization.data(withJSONObject: snapshotValue, options: .fragmentsAllowed)
         }
 
         return StateSnapshotEventDTO(snapshot: snapshotData, timestamp: timestamp)

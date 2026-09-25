@@ -41,9 +41,8 @@ struct ActivityMessageDTO {
         } else if activityContentValue is [Any] || activityContentValue is [String: Any] {
             activityContent = try JSONSerialization.data(withJSONObject: activityContentValue, options: [])
         } else {
-            // Primitive value - wrap in encoder
-            let encoder = JSONEncoder()
-            activityContent = try encoder.encode(JSONPrimitiveWrapper(value: activityContentValue))
+            // Primitives: `.fragmentsAllowed` keeps NSNumber booleans and numbers distinct
+            activityContent = try JSONSerialization.data(withJSONObject: activityContentValue, options: .fragmentsAllowed)
         }
 
         return ActivityMessageDTO(id: id, activityType: activityType, activityContent: activityContent)

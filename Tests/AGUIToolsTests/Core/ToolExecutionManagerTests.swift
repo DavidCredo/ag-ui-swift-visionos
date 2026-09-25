@@ -14,7 +14,7 @@ private actor CapturingToolExecutor: ToolExecutor {
     var errorToThrow: Error?
 
     init(name: String) {
-        tool = Tool(name: name, description: "Test tool", parameters: Data("{}".utf8))
+        tool = Tool(name: name, description: "Test tool", parameters: [:])
     }
 
     func execute(context: ToolExecutionContext) async throws -> ToolExecutionResult {
@@ -231,7 +231,7 @@ final class ToolExecutionManagerTests: XCTestCase {
     func test_processEventStream_argDeltas_areConcatenatedBeforeExecution() async throws {
         // Given: executor that captures the raw arguments string
         actor ArgCapturingExecutor: ToolExecutor {
-            let tool = Tool(name: "args_tool", description: "", parameters: Data("{}".utf8))
+            let tool = Tool(name: "args_tool", description: "", parameters: [:])
             private(set) var capturedArguments = ""
 
             func execute(context: ToolExecutionContext) async throws -> ToolExecutionResult {
