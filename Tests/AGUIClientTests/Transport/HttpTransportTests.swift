@@ -1,6 +1,9 @@
 // Copyright (c) 2025 Perfect Aduh. MIT License. See LICENSE for details.
 
 import XCTest
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 @testable import AGUIClient
 @testable import AGUICore
 

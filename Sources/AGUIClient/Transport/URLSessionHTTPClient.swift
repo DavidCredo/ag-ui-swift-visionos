@@ -1,6 +1,9 @@
 // Copyright (c) 2025 Perfect Aduh. MIT License. See LICENSE for details.
 
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 /// URLSession-based HTTP client implementation.
 ///
@@ -66,6 +69,32 @@ public actor URLSessionHTTPClient: HTTPClient {
     /// - `.cancelled` → `.cancelled`
     /// - Other errors → `.networkError`
     public func execute(_ request: URLRequest) async throws -> HTTPResponse {
+        #if canImport(FoundationNetworking)
+        // swift-corelibs-foundation has no `URLSession.bytes(for:)`, so on Linux
+        // the body is buffered in full before it is handed out as a stream.
+        let (data, response): (Data, URLResponse)
+
+        do {
+            (data, response) = try await session.data(for: request)
+        } catch let error as URLError {
+            throw mapURLError(error)
+        } catch {
+            throw ClientError.networkError(error)
+        }
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw ClientError.invalidResponse
+        }
+
+        let stream = AsyncThrowingStream<UInt8, Error> { continuation in
+            for byte in data {
+                continuation.yield(byte)
+            }
+            continuation.finish()
+        }
+
+        return HTTPResponse(bytes: stream, httpResponse: httpResponse)
+        #else
         let (bytes, response): (URLSession.AsyncBytes, URLResponse)
 
         do {
@@ -97,6 +126,7 @@ public actor URLSessionHTTPClient: HTTPClient {
         }
 
         return HTTPResponse(bytes: stream, httpResponse: httpResponse)
+        #endif
     }
 
     /// Maps URLError to ClientError.

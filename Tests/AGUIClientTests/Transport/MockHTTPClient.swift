@@ -1,6 +1,9 @@
 // Copyright (c) 2025 Perfect Aduh. MIT License. See LICENSE for details.
 
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 @testable import AGUIClient
 
 /// Mock HTTP client for testing.

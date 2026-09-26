@@ -1,6 +1,9 @@
 // Copyright (c) 2025 Perfect Aduh. MIT License. See LICENSE for details.
 
 import XCTest
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 @testable import AGUIClient
 
 final class URLSessionHTTPClientTests: XCTestCase {
@@ -155,17 +158,23 @@ final class URLSessionHTTPClientTests: XCTestCase {
         let ephemeralConfig = URLSessionConfiguration.ephemeral
         let ephemeralClient = URLSessionHTTPClient.create(configuration: ephemeralConfig)
 
-        let backgroundConfig = URLSessionConfiguration.background(withIdentifier: "test")
-        let backgroundClient = URLSessionHTTPClient.create(configuration: backgroundConfig)
-
         XCTAssertNotNil(defaultClient)
         XCTAssertNotNil(ephemeralClient)
+
+        #if !canImport(FoundationNetworking)
+        // Background sessions exist only on Darwin.
+        let backgroundConfig = URLSessionConfiguration.background(withIdentifier: "test")
+        let backgroundClient = URLSessionHTTPClient.create(configuration: backgroundConfig)
         XCTAssertNotNil(backgroundClient)
+        #endif
     }
 
     // MARK: - Cancellation Tests
 
     func testCancellingStreamConsumerCancelsURLSessionTask() async throws {
+        #if canImport(FoundationNetworking)
+        throw XCTSkip("Linux buffers the whole body, so a never-ending response never returns.")
+        #else
         let stopped = expectation(description: "URLSession task cancelled")
         NeverEndingStreamProtocol.onStopLoading = { stopped.fulfill() }
         defer { NeverEndingStreamProtocol.onStopLoading = nil }
@@ -188,6 +197,7 @@ final class URLSessionHTTPClientTests: XCTestCase {
         consumer.cancel()
 
         await fulfillment(of: [stopped], timeout: 5)
+        #endif
     }
 }
 
