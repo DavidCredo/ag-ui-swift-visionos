@@ -162,4 +162,57 @@ final class URLSessionHTTPClientTests: XCTestCase {
         XCTAssertNotNil(ephemeralClient)
         XCTAssertNotNil(backgroundClient)
     }
+
+    // MARK: - Cancellation Tests
+
+    func testCancellingStreamConsumerCancelsURLSessionTask() async throws {
+        let stopped = expectation(description: "URLSession task cancelled")
+        NeverEndingStreamProtocol.onStopLoading = { stopped.fulfill() }
+        defer { NeverEndingStreamProtocol.onStopLoading = nil }
+
+        let config = URLSessionConfiguration.ephemeral
+        config.protocolClasses = [NeverEndingStreamProtocol.self]
+        let client = URLSessionHTTPClient(session: URLSession(configuration: config))
+        let url = try XCTUnwrap(URL(string: "https://agent.test/stream"))
+        let response = try await client.execute(URLRequest(url: url))
+
+        let receivedByte = expectation(description: "received first byte")
+        receivedByte.assertForOverFulfill = false
+        let consumer = Task {
+            for try await _ in response.bytes {
+                receivedByte.fulfill()
+            }
+        }
+
+        await fulfillment(of: [receivedByte], timeout: 5)
+        consumer.cancel()
+
+        await fulfillment(of: [stopped], timeout: 5)
+    }
 }
+
+/// Serves one SSE chunk and then keeps the connection open until URLSession stops it.
+private final class NeverEndingStreamProtocol: URLProtocol {
+    nonisolated(unsafe) static var onStopLoading: (@Sendable () -> Void)?
+
+    override class func canInit(with request: URLRequest) -> Bool { true }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+
+    override func startLoading() {
+        guard let url = request.url,
+              let response = HTTPURLResponse(
+                  url: url,
+                  statusCode: 200,
+                  httpVersion: "HTTP/1.1",
+                  headerFields: ["Content-Type": "text/event-stream"]
+              ) else { return }
+        client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+        client?.urlProtocol(self, didLoad: Data("data: {}\n\n".utf8))
+        // Intentionally never calls urlProtocolDidFinishLoading.
+    }
+
+    override func stopLoading() {
+        Self.onStopLoading?()
+    }
+}
+

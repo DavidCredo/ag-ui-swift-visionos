@@ -83,7 +83,7 @@ public actor URLSessionHTTPClient: HTTPClient {
         // Bridge URLSession.AsyncBytes → AsyncThrowingStream<UInt8, Error> so that
         // HTTPResponse is decoupled from URLSession and can be mocked in tests.
         let stream = AsyncThrowingStream<UInt8, Error> { continuation in
-            Task {
+            let task = Task {
                 do {
                     for try await byte in bytes {
                         continuation.yield(byte)
@@ -93,6 +93,7 @@ public actor URLSessionHTTPClient: HTTPClient {
                     continuation.finish(throwing: error)
                 }
             }
+            continuation.onTermination = { _ in task.cancel(); bytes.task.cancel() }
         }
 
         return HTTPResponse(bytes: stream, httpResponse: httpResponse)
