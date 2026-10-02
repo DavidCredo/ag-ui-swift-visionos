@@ -129,8 +129,10 @@ public actor HttpTransport {
             request.setValue(lastEventId, forHTTPHeaderField: "Last-Event-ID")
         }
 
-        // Encode RunAgentInput to JSON
+        // Encode RunAgentInput to JSON. Sorted keys keep the body byte-stable
+        // across requests, so the provider's prompt cache can match it.
         let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
         do {
             request.httpBody = try encoder.encode(input)
         } catch {
